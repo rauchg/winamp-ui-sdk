@@ -642,6 +642,30 @@ const visCtx = visCanvas.getContext("2d")!
     },
     { capture: true },
   )
+
+  // Prevent mobile pinch-to-zoom and double-tap zoom on iOS Safari & Android Chrome
+  const preventZoomGesture = (e: Event) => {
+    e.preventDefault()
+  }
+  document.addEventListener("gesturestart", preventZoomGesture, { passive: false })
+  document.addEventListener("gesturechange", preventZoomGesture, { passive: false })
+  document.addEventListener("gestureend", preventZoomGesture, { passive: false })
+  document.addEventListener(
+    "touchmove",
+    (e: TouchEvent) => {
+      if (e.touches.length > 1) {
+        e.preventDefault()
+      }
+    },
+    { passive: false },
+  )
+  document.addEventListener(
+    "dblclick",
+    (e: MouseEvent) => {
+      e.preventDefault()
+    },
+    { passive: false },
+  )
 }
 
 // Edge-to-edge pill slider pointer geometry powered by @ui-sdk/core's bindDrag

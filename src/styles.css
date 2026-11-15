@@ -9,6 +9,7 @@
 *::before,
 *::after {
   box-sizing: border-box;
+  touch-action: none;
 }
 
 html,
@@ -21,6 +22,10 @@ body {
   color: #1c2230;
   font-family: var(--winamp-font-ui);
   -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  touch-action: none;
+  overscroll-behavior: none;
   user-select: none;
   overflow: hidden;
 }
@@ -1181,6 +1186,16 @@ winamp-window[data-live-fullview] .winamp-fullview-bay {
   min-height: 0;
   overflow-y: auto;
   padding: 6px 8px;
+  touch-action: pan-y;
+}
+
+.wa-pl-scroll *,
+.wa-track-scroll,
+.wa-track-scroll *,
+.wa-ml-filter-col,
+.wa-ml-filter-col *,
+.agent-snapshot-pre {
+  touch-action: pan-y;
 }
 
 .wa-pl-row {
