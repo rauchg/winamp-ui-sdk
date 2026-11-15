@@ -1,0 +1,1341 @@
+:root {
+  color-scheme: light;
+  --winamp-font-ui: "Tahoma", "Trebuchet MS", "Segoe UI", Arial, sans-serif;
+  --winamp-font-mono: "SF Mono", "Consolas", "Monaco", monospace;
+  --winamp-hue-rotate: 0deg;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  background: #ffffff;
+  color: #1c2230;
+  font-family: var(--winamp-font-ui);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  overflow: hidden;
+}
+
+body.bare-mode {
+  background: #000000;
+}
+
+.desktop-stage {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+}
+
+body.bare-mode .desktop-stage {
+  width: 927px;
+  height: 442px;
+}
+
+/* Top-right Source link on the demo website */
+.demo-source-link {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(8px);
+  color: #3f3f46;
+  font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+
+.demo-source-link:hover {
+  color: #09090b;
+  border-color: rgba(15, 23, 42, 0.22);
+  background: #ffffff;
+}
+
+body.bare-mode .demo-source-link {
+  display: none !important;
+}
+
+/* ==========================================================================
+   <winamp-window> Custom Element (@ui-sdk/core definePrimitive + createResize)
+   Default compact size: 496 x 236 CSS px (1.4x crisp modern desktop scale)
+   ========================================================================== */
+
+winamp-window {
+  display: block;
+  z-index: 10;
+  overflow: visible;
+  --winamp-dw: var(--live-dw, var(--base-dw, 0px));
+  --winamp-dh: var(--live-dh, var(--base-dh, 0px));
+  --seek-track-num: var(--live-seek-num, var(--base-seek-num, 639));
+  will-change: left, top, width, height;
+}
+
+.winamp-shadow-plate {
+  position: absolute;
+  left: 3px;
+  top: 6px;
+  width: calc(920px + var(--winamp-dw, 0px));
+  height: calc(423px + var(--winamp-dh, 0px));
+  border-radius: 19px;
+  box-shadow:
+    0 20px 50px rgba(15, 23, 42, 0.18),
+    0 5px 14px rgba(15, 23, 42, 0.1);
+  pointer-events: none;
+}
+
+body.bare-mode .winamp-shadow-plate {
+  display: none;
+}
+
+/* Smoothly glide into the center of the viewport when resizing ends */
+winamp-window[data-centering="pos"] {
+  transition:
+    left 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    top 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+winamp-window[data-centering="all"] {
+  transition:
+    left 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    top 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+winamp-window[data-dragging] {
+  cursor: grabbing;
+}
+
+winamp-window[data-shaded] {
+  height: var(--winamp-shaded-h, 29px) !important;
+  overflow: hidden;
+}
+
+winamp-window[data-minimized] {
+  opacity: 0.4;
+  transform: scale(0.92);
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.winamp-deck-scaler {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(927px + var(--winamp-dw, 0px));
+  height: calc(442px + var(--winamp-dh, 0px));
+  transform-origin: 0 0;
+  transform: scale(var(--winamp-scale, 0.535059));
+}
+
+html[data-winamp-themed="true"] .winamp-deck-scaler {
+  filter: hue-rotate(var(--winamp-hue-rotate, 0deg));
+}
+
+.winamp-chassis-svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  display: block;
+}
+
+/* ==========================================================================
+   <winamp-resize-handle> (@ui-sdk/core createResize handles — zero snap)
+   ========================================================================== */
+
+winamp-resize-handle {
+  position: absolute;
+  z-index: 30;
+  outline: none;
+}
+
+winamp-resize-handle:focus-visible {
+  box-shadow: inset 0 0 0 2px #3b6ed4;
+  border-radius: 4px;
+}
+
+winamp-resize-handle[handle="n"] {
+  top: -5px;
+  left: 14px;
+  right: 14px;
+  height: 9px;
+}
+winamp-resize-handle[handle="s"] {
+  bottom: -5px;
+  left: 14px;
+  right: 26px;
+  height: 10px;
+}
+winamp-resize-handle[handle="w"] {
+  left: -5px;
+  top: 14px;
+  bottom: 14px;
+  width: 10px;
+}
+winamp-resize-handle[handle="e"] {
+  right: -5px;
+  top: 14px;
+  bottom: 26px;
+  width: 10px;
+}
+winamp-resize-handle[handle="nw"] {
+  left: -5px;
+  top: -5px;
+  width: 16px;
+  height: 16px;
+}
+winamp-resize-handle[handle="ne"] {
+  right: -5px;
+  top: -5px;
+  width: 16px;
+  height: 16px;
+}
+winamp-resize-handle[handle="sw"] {
+  left: -5px;
+  bottom: -5px;
+  width: 16px;
+  height: 16px;
+}
+winamp-resize-handle[handle="se"] {
+  right: -4px;
+  bottom: -4px;
+  width: 28px;
+  height: 28px;
+}
+
+body.bare-mode winamp-resize-handle {
+  display: none;
+}
+
+/* LED toggle states inside chassis SVG */
+#led-repeat[data-lit="false"] .led-bloom,
+#led-shuffle[data-lit="false"] .led-bloom {
+  opacity: 0;
+}
+
+#led-repeat[data-lit="true"] .led-bloom,
+#led-shuffle[data-lit="true"] .led-bloom {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   Titlebar (<winamp-titlebar>) + Right-Anchored Window Controls
+   ========================================================================== */
+
+winamp-titlebar {
+  position: absolute;
+  left: 3px;
+  top: 6px;
+  width: calc(920px + var(--winamp-dw, 0px));
+  height: 44px;
+  cursor: grab;
+  z-index: 5;
+  outline: none;
+}
+
+winamp-titlebar:active {
+  cursor: grabbing;
+}
+
+winamp-titlebar:focus-visible {
+  box-shadow: inset 0 0 0 2px rgba(158, 194, 255, 0.85);
+  border-radius: 18px 18px 0 0;
+}
+
+.winamp-win-btn {
+  position: absolute;
+  top: 11px;
+  width: 24px;
+  height: 21px;
+  padding: 0;
+  border: 1px solid #0d1426;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #475470 0%, #24314c 48%, #18233d 100%);
+  box-shadow: inset 0 1px 0 rgba(205, 218, 244, 0.36), 0 1px 0 rgba(160, 178, 212, 0.2);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.winamp-win-btn:hover {
+  background: linear-gradient(180deg, #59698b 0%, #2d3e60 48%, #1f2d4e 100%);
+}
+
+.winamp-win-btn:active {
+  transform: translateY(1px);
+  background: linear-gradient(180deg, #1b253f 0%, #2d3c5c 100%);
+}
+
+.winamp-win-btn--min {
+  left: calc(816px + var(--winamp-dw, 0px));
+}
+.winamp-win-btn--shade {
+  left: calc(847px + var(--winamp-dw, 0px));
+}
+.winamp-win-btn--close {
+  left: calc(879px + var(--winamp-dw, 0px));
+  width: 23px;
+}
+
+/* ==========================================================================
+   Menubar (<ui-menubar> + <ui-menu>)
+   ========================================================================== */
+
+ui-menubar.winamp-menubar {
+  position: absolute;
+  left: 3px;
+  top: 52px;
+  width: calc(920px + var(--winamp-dw, 0px));
+  height: 40px;
+  display: block;
+  z-index: 8;
+}
+
+.winamp-menu-trigger-btn {
+  position: absolute;
+  top: 2px;
+  height: 35px;
+  padding: 0 8px;
+  margin: 0;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: #26272d;
+  font-family: "Tahoma", "Verdana", "Segoe UI", Arial, sans-serif;
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 33px;
+  letter-spacing: -0.2px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+.winamp-menu-trigger-btn .mnemonic {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.winamp-menu-trigger-btn:hover,
+.winamp-menu-trigger-btn[data-open],
+ui-menu-trigger[data-open] > .winamp-menu-trigger-btn {
+  background: linear-gradient(180deg, #ffffff 0%, #d4daea 100%);
+  border-color: #8c95ab;
+  box-shadow: inset 0 1px 0 #ffffff;
+  color: #16223b;
+}
+
+.winamp-menu-trigger-btn:focus-visible {
+  outline: 1.5px dotted #2a4580;
+  outline-offset: -2px;
+}
+
+.winamp-menu-trigger--file {
+  left: 16px;
+}
+.winamp-menu-trigger--play {
+  left: 96px;
+}
+.winamp-menu-trigger--options {
+  left: 187px;
+}
+.winamp-menu-trigger--view {
+  left: 317px;
+}
+.winamp-menu-trigger--help {
+  left: 418px;
+}
+
+[data-slot="menu-content"] {
+  min-width: 220px;
+  padding: 4px;
+  margin: 0;
+  border: 1px solid #59637d;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #f7f8fb 0%, #e3e6f0 100%);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.26), inset 0 1px 0 #ffffff;
+  color: #1b202c;
+  font-family: var(--winamp-font-ui);
+  font-size: 12.5px;
+}
+
+[data-slot="menu-item"],
+[data-slot="menu-checkbox-item"],
+[data-slot="menu-radio-item"] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 5px 10px 5px 24px;
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+  color: #1c2230;
+  outline: none;
+}
+
+[data-slot="menu-item"][data-highlighted],
+[data-slot="menu-checkbox-item"][data-highlighted],
+[data-slot="menu-radio-item"][data-highlighted] {
+  background: linear-gradient(180deg, #3c69c4 0%, #244a99 100%);
+  color: #ffffff;
+}
+
+[data-slot="menu-item-indicator"] {
+  position: absolute;
+  left: 7px;
+  width: 14px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 11px;
+}
+
+[data-slot="menu-checkbox-item"][data-checked] [data-slot="menu-item-indicator"]::before {
+  content: "✓";
+}
+
+[data-slot="menu-radio-item"][data-checked] [data-slot="menu-item-indicator"]::before {
+  content: "•";
+  font-size: 14px;
+}
+
+[data-slot="menu-separator"] {
+  height: 1px;
+  margin: 4px 6px;
+  background: #c1c6d4;
+  box-shadow: 0 1px 0 #ffffff;
+}
+
+.menu-kbd {
+  font-size: 11px;
+  opacity: 0.65;
+  font-family: var(--winamp-font-mono);
+}
+
+/* ==========================================================================
+   LCD Screen (<winamp-lcd>) — Elastic Width (776 + dW)
+   ========================================================================== */
+
+winamp-lcd {
+  position: absolute;
+  left: 25px;
+  top: 113px;
+  width: calc(776px + var(--winamp-dw, 0px));
+  height: 155px;
+  border-radius: 18px;
+  overflow: hidden;
+  z-index: 4;
+  cursor: pointer;
+}
+
+.winamp-lcd-canvas {
+  display: block;
+  border-radius: 18px;
+}
+
+/* ==========================================================================
+   Shared 3D Convex Brushed-Silver Metallic Button Surface
+   ========================================================================== */
+
+.metal-pill-btn,
+.metal-round-btn {
+  border: 1px solid #353a4a;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  background: radial-gradient(circle at 46% 24%, #ffffff 0%, #f1f2f7 34%, #cfd3e2 74%, #a8afc4 100%);
+  box-shadow:
+    inset 0 1.5px 1px #ffffff,
+    inset 0 -2px 2.5px rgba(82, 89, 112, 0.55),
+    0 1px 2px rgba(15, 18, 28, 0.45);
+  transition: filter 80ms ease, transform 60ms ease;
+}
+
+.metal-pill-btn:hover,
+.metal-round-btn:hover {
+  filter: brightness(1.04);
+}
+
+.metal-pill-btn:active,
+.metal-round-btn:active {
+  transform: translateY(1px);
+  background: radial-gradient(circle at 50% 65%, #eef0f6 0%, #c6cbd9 60%, #9fa6bc 100%);
+  box-shadow:
+    inset 0 2px 3px rgba(55, 62, 82, 0.65),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.7);
+}
+
+.metal-pill-btn:focus-visible,
+.metal-round-btn:focus-visible {
+  outline: 2px solid #3d6ed1;
+  outline-offset: 2px;
+}
+
+.btn-top-dropdown {
+  position: absolute;
+  left: calc(828px + var(--winamp-dw, 0px));
+  top: 101px;
+  width: 67px;
+  height: 22px;
+  border-radius: 11px;
+  z-index: 6;
+}
+
+.btn-repeat {
+  position: absolute;
+  left: calc(819px + var(--winamp-dw, 0px));
+  top: 146px;
+  width: 52px;
+  height: 45px;
+  border-radius: 22.5px;
+  z-index: 6;
+}
+
+.btn-shuffle {
+  position: absolute;
+  left: calc(819px + var(--winamp-dw, 0px));
+  top: 204px;
+  width: 52px;
+  height: 42px;
+  border-radius: 21px;
+  z-index: 6;
+}
+
+.btn-repeat[data-pressed],
+.btn-shuffle[data-pressed] {
+  box-shadow:
+    inset 0 1.5px 1px #ffffff,
+    inset 0 -2px 3px rgba(55, 88, 168, 0.48),
+    0 1px 2px rgba(15, 18, 28, 0.45);
+}
+
+/* ==========================================================================
+   Seek Slider & Volume Slider (<ui-slider>)
+   Full edge-to-edge groove travel at ANY dynamic width (639 + dW)
+   ========================================================================== */
+
+ui-slider.winamp-seek-slider {
+  position: absolute;
+  left: 29px;
+  top: 286px;
+  width: calc(639px + var(--winamp-dw, 0px));
+  height: 30px;
+  display: block;
+  z-index: 6;
+}
+
+ui-slider.winamp-seek-slider [data-slot="slider-control"] {
+  position: relative;
+  width: 100%;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  touch-action: none;
+}
+
+ui-slider.winamp-seek-slider [data-slot="slider-track"] {
+  position: relative;
+  width: 100%;
+  height: 6.5px;
+  border-radius: 3.25px;
+}
+
+ui-slider.winamp-seek-slider [data-slot="slider-indicator"] {
+  inset-inline-start: 0 !important;
+  width: calc(
+    var(--slider-indicator-size, 0%) -
+      (var(--slider-indicator-size, 0%) * 85 / var(--seek-track-num, 639)) + 42.5px
+  ) !important;
+  height: 6.5px;
+  border-radius: 3.25px 0 0 3.25px;
+  background: linear-gradient(180deg, #5572b8 0%, #8399cf 55%, #4762a6 100%);
+}
+
+ui-slider.winamp-seek-slider [data-slot="slider-thumb"] {
+  width: 85px;
+  height: 20px;
+  inset-inline: var(--slider-thumb-position, 0%) auto !important;
+  margin-inline: 0 !important;
+  justify-self: auto !important;
+  translate: calc(var(--slider-thumb-position, 0%) * -1) -50% !important;
+  border-radius: 10px;
+  border: 1.2px solid #2b3040;
+  background: linear-gradient(180deg, #e7e8ef 0%, #ffffff 34%, #d6d9e5 74%, #aeb4c8 100%);
+  box-shadow:
+    inset 0 1.5px 0.5px #ffffff,
+    inset 0 -1.5px 1.5px rgba(78, 86, 110, 0.52),
+    0 1.5px 2.5px rgba(12, 16, 28, 0.58);
+  cursor: grab;
+}
+
+ui-slider.winamp-seek-slider[data-dragging] [data-slot="slider-thumb"] {
+  cursor: grabbing;
+  filter: brightness(1.03);
+}
+
+ui-slider.winamp-volume-slider {
+  position: absolute;
+  left: 483px;
+  top: 380px;
+  width: 211px;
+  height: 30px;
+  display: block;
+  z-index: 6;
+}
+
+ui-slider.winamp-volume-slider [data-slot="slider-control"] {
+  position: relative;
+  width: 211px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  touch-action: none;
+}
+
+ui-slider.winamp-volume-slider [data-slot="slider-track"] {
+  position: relative;
+  width: 211px;
+  height: 5.5px;
+  border-radius: 3px;
+}
+
+ui-slider.winamp-volume-slider [data-slot="slider-indicator"] {
+  inset-inline-start: 0 !important;
+  width: calc(var(--slider-indicator-size, 0%) * 0.79147 + 22px) !important;
+  height: 5.5px;
+  border-radius: 3px 0 0 3px;
+  background: linear-gradient(180deg, #5a74b8 0%, #8b9fd2 55%, #4d67aa 100%);
+}
+
+ui-slider.winamp-volume-slider [data-slot="slider-thumb"] {
+  width: 44px;
+  height: 21px;
+  inset-inline: var(--slider-thumb-position, 0%) auto !important;
+  margin-inline: 0 !important;
+  justify-self: auto !important;
+  translate: calc(var(--slider-thumb-position, 0%) * -1) -50% !important;
+  border-radius: 10.5px;
+  border: 1.2px solid #2b3040;
+  background: linear-gradient(180deg, #e8e9f0 0%, #ffffff 36%, #d5d8e4 76%, #aeb4c8 100%);
+  box-shadow:
+    inset 0 1.5px 0.5px #ffffff,
+    inset 0 -1.5px 1.5px rgba(78, 86, 110, 0.52),
+    0 1.5px 2.5px rgba(12, 16, 28, 0.52);
+  cursor: grab;
+}
+
+[data-slot="slider-thumb"]:has(:focus-visible) {
+  outline: 2px solid #3d6ed1;
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   Right-Anchored Capsule Cluster (Eject / PL / ML) + Transport + CONFIG
+   ========================================================================== */
+
+.btn-eject {
+  position: absolute;
+  left: calc(697px + var(--winamp-dw, 0px));
+  top: 286px;
+  width: 54px;
+  height: 40px;
+  border-radius: 20px;
+  z-index: 6;
+}
+
+.btn-pl,
+.btn-ml {
+  position: absolute;
+  top: 286px;
+  width: 62px;
+  height: 40px;
+  border-radius: 20px;
+  z-index: 6;
+  font-family: "Arial Black", "Trebuchet MS", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 19px;
+  letter-spacing: 0.4px;
+  color: #1c202b;
+}
+
+.btn-pl {
+  left: calc(764px + var(--winamp-dw, 0px));
+}
+.btn-ml {
+  left: calc(832px + var(--winamp-dw, 0px));
+}
+
+.btn-pl[data-pressed],
+.btn-ml[data-pressed] {
+  color: #3662b5;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+ui-toolbar.winamp-transport {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 6;
+}
+
+ui-toolbar.winamp-transport button {
+  pointer-events: auto;
+}
+
+.metal-round-btn {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.btn-prev {
+  left: 33px;
+  top: 350px;
+  width: 44px;
+  height: 44px;
+}
+.btn-play {
+  left: 105px;
+  top: 349px;
+  width: 50px;
+  height: 50px;
+}
+.btn-pause {
+  left: 183px;
+  top: 349px;
+  width: 50px;
+  height: 50px;
+}
+.btn-stop {
+  left: 261px;
+  top: 349px;
+  width: 50px;
+  height: 50px;
+}
+.btn-next {
+  left: 341px;
+  top: 350px;
+  width: 44px;
+  height: 44px;
+}
+
+.btn-mute {
+  left: 432.5px;
+  top: 369.5px;
+  width: 31px;
+  height: 31px;
+  z-index: 6;
+}
+
+.btn-config {
+  position: absolute;
+  left: calc(727px + var(--winamp-dw, 0px));
+  top: 399px;
+  width: 85px;
+  height: 22px;
+  border-radius: 11px;
+  z-index: 6;
+}
+
+/* ==========================================================================
+   Integrated Authentic Winamp 5 Modern Full View Bay (inside brushed-silver hull!)
+   ========================================================================== */
+
+.winamp-fullview-bay {
+  position: absolute;
+  left: 16px;
+  top: 436px;
+  width: calc(895px + var(--winamp-dw, 0px));
+  height: calc(var(--winamp-dh, 0px) - 24px);
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 7;
+  overflow: hidden;
+}
+
+winamp-window[data-fullview] .winamp-fullview-bay,
+winamp-window[data-live-fullview] .winamp-fullview-bay {
+  display: flex;
+}
+
+/* 1. Brushed-Silver Winamp 5 Modern Config / Equalizer Drawer (configdrawer.xml) */
+.wa-config-deck {
+  flex-shrink: 0;
+  border-radius: 12px;
+  border: 1.5px solid #6b7288;
+  background: linear-gradient(180deg, #eceef5 0%, #d4d7e4 52%, #bec3d4 100%);
+  box-shadow:
+    inset 0 1.5px 0 #ffffff,
+    0 2px 4px rgba(24, 30, 48, 0.22);
+  padding: 8px 14px 12px;
+}
+
+.wa-config-deck[hidden] {
+  display: none;
+}
+
+/* Sculpted silver tab bar (<ui-tabs>) */
+.wa-tabs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.wa-tab-list {
+  display: inline-flex;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 9px;
+  background: #a5abc0;
+  box-shadow: inset 0 1.5px 2px rgba(45, 52, 72, 0.45), 0 1px 0 #ffffff;
+}
+
+.wa-tab-btn {
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 4px 14px;
+  background: transparent;
+  color: #293040;
+  font-family: var(--winamp-font-ui);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+}
+
+[data-slot="tabs-tab"][data-selected] > .wa-tab-btn,
+.wa-tab-btn[aria-selected="true"] {
+  border-color: #4d556b;
+  background: linear-gradient(180deg, #ffffff 0%, #dfe3ef 100%);
+  color: #1c469c;
+  box-shadow: 0 1px 2px rgba(20, 26, 42, 0.28), inset 0 1px 0 #ffffff;
+}
+
+.wa-mini-pill {
+  border: 1.2px solid #3c4254;
+  border-radius: 12px;
+  padding: 3px 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #eaecf3 45%, #c5cadb 100%);
+  box-shadow: inset 0 1px 0 #ffffff, 0 1px 2px rgba(20, 25, 40, 0.3);
+  color: #1f2533;
+  font-family: var(--winamp-font-ui);
+  font-size: 14.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wa-mini-pill:hover {
+  filter: brightness(1.04);
+}
+
+.wa-mini-pill:active {
+  transform: translateY(1px);
+}
+
+.wa-mini-pill[data-pressed] {
+  color: #1d4fb8;
+}
+
+.wa-mini-led {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #8f96ad;
+  border: 1px solid #596075;
+  display: inline-block;
+}
+
+.wa-mini-pill[data-pressed] .wa-mini-led {
+  background: radial-gradient(circle at 38% 35%, #e6f9ff 0%, #4577e6 68%, #1d3c8c 100%);
+  border-color: #204092;
+  box-shadow: 0 0 6px rgba(62, 118, 245, 0.8);
+}
+
+/* Equalizer Row: Controls + Spline Graph + Preamp + 10 Metallic Faders */
+.wa-eq-layout {
+  display: grid;
+  grid-template-columns: 165px 1fr;
+  gap: 16px;
+  align-items: center;
+}
+
+.wa-eq-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wa-eq-spline-box {
+  height: 68px;
+  border-radius: 8px;
+  border: 1.5px solid #222d48;
+  background: linear-gradient(180deg, #1b3d86 0%, #102459 100%);
+  box-shadow: inset 0 2px 5px rgba(5, 11, 28, 0.7), 0 1px 0 #ffffff;
+  overflow: hidden;
+  position: relative;
+}
+
+.wa-eq-faders {
+  display: grid;
+  grid-template-columns: 54px repeat(10, 1fr);
+  gap: 6px;
+  align-items: center;
+}
+
+.wa-eq-band {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.wa-eq-band--preamp {
+  border-right: 1.5px groove rgba(255, 255, 255, 0.75);
+  padding-right: 8px;
+}
+
+.eq-band-slider {
+  height: 112px;
+  width: 30px;
+}
+
+.eq-band-slider [data-slot="slider-control"] {
+  position: relative;
+  width: 30px;
+  height: 112px;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.eq-band-slider [data-slot="slider-track"] {
+  position: relative;
+  width: 7px;
+  margin-top: 9px;
+  height: 94px;
+  border-radius: 3.5px;
+  background: #141a2b;
+  border: 1px solid #555e75;
+  box-shadow: 1px 0 0 rgba(255, 255, 255, 0.7);
+}
+
+.eq-band-slider [data-slot="slider-indicator"] {
+  border-radius: 3px;
+  background: linear-gradient(180deg, #86afff 0%, #3d69c7 100%);
+}
+
+.eq-band-slider [data-slot="slider-thumb"] {
+  width: 24px;
+  height: 13px;
+  border-radius: 6.5px;
+  border: 1.2px solid #2b3142;
+  background: linear-gradient(180deg, #ffffff 0%, #eceef5 42%, #b9c0d4 100%);
+  box-shadow: inset 0 1px 0 #ffffff, 0 1.5px 2px rgba(14, 18, 30, 0.5);
+  cursor: grab;
+}
+
+.eq-freq-label {
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--winamp-font-mono);
+  color: #2c3344;
+}
+
+.wa-theme-swatches {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 2px;
+}
+
+/* 2. Authentic Winamp 5 Modern Lower Workspace (Media Library / Playlist Editor / AVS) */
+.wa-workspace {
+  flex: 1;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.wa-workspace > ui-tabs {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wa-workspace [data-slot="tabs-panel"] {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.wa-workspace [data-slot="tabs-panel"][hidden] {
+  display: none;
+}
+
+/* Recessed Cobalt Winamp LCD Viewport inside Playlist / Media Library / Visualizer */
+.wa-lcd-pane {
+  flex: 1;
+  min-height: 0;
+  border-radius: 12px;
+  border: 2.5px solid #1e2840;
+  background: linear-gradient(180deg, #162e6b 0%, #102354 55%, #0c1b44 100%);
+  box-shadow:
+    inset 0 3px 8px rgba(4, 10, 26, 0.8),
+    0 1.5px 0 #ffffff;
+  color: #c8dafc;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 3-Pane Winamp 5 Media Library (ml-normal.xml: Tree | Artists & Albums | Tracks) */
+.wa-ml-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 205px 1fr;
+  border-radius: 12px;
+  overflow: hidden;
+  gap: 2px;
+  background: #7c849c;
+  border: 2px solid #222c44;
+  box-shadow: 0 1.5px 0 #ffffff;
+}
+
+.wa-ml-tree {
+  background: linear-gradient(180deg, #142b64 0%, #0e1f4c 100%);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow-y: auto;
+}
+
+.wa-ml-tree-title {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: #88a8e8;
+  padding: 4px 8px;
+  text-transform: uppercase;
+}
+
+.wa-ml-tree-btn {
+  border: 0;
+  border-radius: 5px;
+  padding: 6px 10px;
+  background: transparent;
+  color: #c4d6fa;
+  font-family: var(--winamp-font-ui);
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.wa-ml-tree-btn:hover {
+  background: rgba(90, 136, 232, 0.22);
+}
+
+.wa-ml-tree-btn[data-active="true"] {
+  background: linear-gradient(90deg, #3564c4 0%, #214594 100%);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.wa-ml-right {
+  display: grid;
+  grid-template-rows: 112px 1fr;
+  gap: 2px;
+  min-height: 0;
+  background: #7c849c;
+}
+
+.wa-ml-filters {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  min-height: 0;
+}
+
+.wa-ml-filter-col {
+  background: #102456;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.wa-col-hdr {
+  position: sticky;
+  top: 0;
+  background: linear-gradient(180deg, #344c84 0%, #1f3364 100%);
+  border-bottom: 1px solid #0b1636;
+  padding: 4px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #dce8ff;
+  letter-spacing: 0.4px;
+}
+
+.wa-filter-item {
+  border: 0;
+  padding: 4px 10px;
+  background: transparent;
+  color: #bfd2f8;
+  font-size: 14.5px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.wa-filter-item:hover {
+  background: rgba(88, 134, 230, 0.22);
+}
+
+.wa-filter-item[data-active="true"] {
+  background: #2f5cb8;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.wa-track-scroll {
+  background: #0d1e49;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.wa-track-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--winamp-font-mono);
+  font-size: 14.5px;
+  color: #bfd2f8;
+}
+
+.wa-track-table th {
+  position: sticky;
+  top: 0;
+  background: linear-gradient(180deg, #324a82 0%, #1d3160 100%);
+  color: #e2ecff;
+  text-align: left;
+  padding: 5px 10px;
+  font-size: 13px;
+  border-bottom: 1px solid #091330;
+}
+
+.wa-track-table td {
+  padding: 5px 10px;
+  border-bottom: 1px solid rgba(90, 128, 204, 0.14);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.wa-track-table tr:hover td {
+  background: rgba(68, 114, 212, 0.28);
+  color: #ffffff;
+}
+
+.wa-track-table tr[data-playing="true"] td {
+  background: linear-gradient(90deg, rgba(64, 122, 238, 0.52) 0%, rgba(32, 68, 148, 0.4) 100%);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* Playlist Editor rows */
+.wa-pl-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 6px 8px;
+}
+
+.wa-pl-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: #bfd3fa;
+  font-family: var(--winamp-font-mono);
+  font-size: 16px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.wa-pl-row:hover {
+  background: rgba(74, 122, 224, 0.26);
+  color: #ffffff;
+}
+
+.wa-pl-row[data-current="true"] {
+  background: linear-gradient(90deg, rgba(68, 124, 236, 0.52) 0%, rgba(30, 64, 144, 0.35) 100%);
+  border-color: rgba(145, 184, 255, 0.48);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* Visualizer Canvas */
+.wa-vis-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Authentic Winamp 5 Modern Bottom Action Bar (pledit-normal.xml: +ADD, -REM, SEL, MISC, LCD Time) */
+.wa-bottom-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 26px 2px 4px;
+}
+
+.wa-bottom-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wa-search-input {
+  height: 28px;
+  width: 210px;
+  padding: 0 10px;
+  border-radius: 14px;
+  border: 1.5px solid #2a395c;
+  background: #102354;
+  color: #e6f0ff;
+  font-family: var(--winamp-font-ui);
+  font-size: 14.5px;
+  outline: none;
+  box-shadow: inset 0 1.5px 3px rgba(4, 10, 26, 0.65), 0 1px 0 #ffffff;
+}
+
+.wa-search-input::placeholder {
+  color: #7ea0de;
+}
+
+.wa-lcd-time-pill {
+  padding: 4px 14px;
+  border-radius: 8px;
+  border: 1.5px solid #1e2a48;
+  background: linear-gradient(180deg, #173478 0%, #0f2252 100%);
+  box-shadow: inset 0 1.5px 4px rgba(4, 10, 26, 0.75), 0 1px 0 #ffffff;
+  color: #dce9ff;
+  font-family: var(--winamp-font-mono);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.agent-snapshot-pre {
+  margin: 6px 0 0;
+  padding: 8px 10px;
+  max-height: 112px;
+  overflow: auto;
+  border-radius: 6px;
+  background: #0c1b42;
+  border: 1px solid #2b4480;
+  color: #c6dcff;
+  font-family: var(--winamp-font-mono);
+  font-size: 13px;
+  line-height: 1.35;
+  user-select: text;
+}
+
+/* ==========================================================================
+   Responsive Mobile Mode (data-mobile on <winamp-window>, <= 560px viewports)
+   Ditches secondary desktop chrome so LCD, Seek, PL & 5 Transport buttons fit
+   comfortably at full tactile thumb size without horizontal overflow.
+   ========================================================================== */
+
+winamp-window[data-mobile] .winamp-deck-scaler {
+  width: 580px;
+}
+
+winamp-window[data-mobile] .winamp-shadow-plate {
+  width: 573px;
+}
+
+winamp-window[data-mobile] winamp-titlebar,
+winamp-window[data-mobile] ui-menubar.winamp-menubar {
+  width: 573px;
+  cursor: default;
+}
+
+winamp-window[data-mobile] winamp-resize-handle,
+winamp-window[data-mobile] .winamp-win-btn,
+winamp-window[data-mobile] .winamp-menu-trigger--view,
+winamp-window[data-mobile] .winamp-menu-trigger--help,
+winamp-window[data-mobile] #btn-top-vis,
+winamp-window[data-mobile] #toggle-repeat,
+winamp-window[data-mobile] #toggle-shuffle,
+winamp-window[data-mobile] #btn-eject,
+winamp-window[data-mobile] #toggle-ml,
+winamp-window[data-mobile] #toggle-mute,
+winamp-window[data-mobile] #slider-volume,
+winamp-window[data-mobile] #toggle-config,
+winamp-window[data-mobile] #wa-config-deck,
+winamp-window[data-mobile] ui-tabs#tabs-workspace ui-tabs-tab[value="ml"],
+winamp-window[data-mobile] #wa-search-input,
+winamp-window[data-mobile] #pl-btn-sel,
+winamp-window[data-mobile] #pl-btn-eq-toggle {
+  display: none !important;
+}
+
+winamp-window[data-mobile] winamp-lcd {
+  width: 530px;
+}
+
+winamp-window[data-mobile] ui-slider.winamp-seek-slider {
+  width: 448px;
+}
+
+winamp-window[data-mobile] .btn-pl {
+  left: 493px;
+}
+
+winamp-window[data-mobile] .winamp-fullview-bay {
+  width: 548px;
+}
+
+winamp-window[data-mobile] .wa-bottom-bar {
+  padding-right: 6px;
+}
+

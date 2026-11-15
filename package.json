@@ -1,0 +1,25 @@
+{
+  "name": "winamp-ui-sdk",
+  "version": "0.1.0",
+  "description": "Winamp 5 Modern recreated in pure Web Components with Vercel UI SDK (@ui-sdk/web + @ui-sdk/core).",
+  "license": "MIT",
+  "type": "module",
+  "homepage": "https://winamp-ui-sdk.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rauchg/winamp-ui-sdk.git"
+  },
+  "scripts": {
+    "dev": "esbuild src/main.ts src/styles.css --bundle --format=esm --target=es2022 --outdir=public --servedir=public --watch",
+    "build": "esbuild src/main.ts src/styles.css --bundle --minify --format=esm --target=es2022 --outdir=public",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ui-sdk/core": "0.1.0-beta.2",
+    "@ui-sdk/web": "0.1.0-beta.2"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  }
+}
